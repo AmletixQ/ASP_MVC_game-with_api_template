@@ -7,7 +7,12 @@ namespace GameWithApiASPTemplate.Controllers
     {
         private string? CurrentUserId => Request.Cookies["UserId"];
 
-        private readonly API _api = new API();
+        private readonly API _api;
+
+        public AccountController(API api)
+        {
+            _api = api;
+        }
 
         public IActionResult Login()
         {
