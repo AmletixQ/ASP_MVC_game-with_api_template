@@ -1,0 +1,96 @@
+﻿@{
+    ViewData["Title"] = "Главная";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Управление API</h1>
+
+    @if (ViewData["Message"] != null)
+    {
+        <div class="alert alert-success">@ViewData["Message"]</div>
+    }
+    @if (ViewData["Error"] != null)
+    {
+        <div class="alert alert-danger">@ViewData["Error"]</div>
+    }
+
+    @if (!(bool)ViewData["IsLoggedIn"])
+    {
+        <div class="alert alert-info">
+            Пожалуйста, <a asp-controller="Account" asp-action="Login">войдите в систему</a>, чтобы увидеть функции.
+        </div>
+    }
+    else
+    {
+        <p><strong>Текущий User ID:</strong> @ViewData["CurrentUserId"]</p>
+        <a asp-controller="Account" asp-action="Logout" class="btn btn-danger mb-4">Выйти</a>
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5>1. Получить баллы игрока</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="GetPoints" method="post">
+                            <div class="input-group">
+                                <input type="text" name="playerId" class="form-control" placeholder="ID игрока" required />
+                                <button type="submit" class="btn btn-info">Получить баллы</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5>2. Добавить баллы (по названию игры)</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="AddPoints" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Название игры</label>
+                                <input type="text" name="gameTitle" class="form-control"
+                                       placeholder="Например: Test Game" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">ID игрока (пользователя)</label>
+                                <input type="text" name="playerId" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Количество баллов</label>
+                                <input type="number" name="amount" class="form-control" min="1" value="10" required />
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Добавить баллы</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-5">
+            <h5>Ваши игры (для справки):</h5>
+            @{
+                var games = ViewData["Games"] as Game[] ?? Array.Empty<Game>();
+            }
+            @if (games.Length > 0)
+            {
+                <ul class="list-group">
+                    @foreach (var game in games)
+                    {
+                        <li class="list-group-item">
+                            <strong>@game.gameTitle</strong> — ID: <code>@game.gameId</code>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-muted">Список игр пуст или не удалось загрузить.</p>
+            }
+        </div>
+    }
+</div>
