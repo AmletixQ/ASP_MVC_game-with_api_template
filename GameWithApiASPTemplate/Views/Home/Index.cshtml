@@ -14,50 +14,108 @@
         <div class="alert alert-danger">@ViewData["Error"]</div>
     }
 
-    @if (!(bool)ViewData["IsLoggedIn"])
-    {
-        <div class="alert alert-info">
-            Пожалуйста, <a asp-controller="Account" asp-action="Login">войдите в систему</a>, чтобы увидеть функции.
+    <div class="row g-4">
+
+        <!-- Карточка аккаунта -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Аккаунт</h5>
+                </div>
+                <div class="card-body">
+                    @if (!(bool)ViewData["IsLoggedIn"])
+                    {
+                        <!-- Форма входа -->
+                        <form asp-controller="Account" asp-action="Login" method="post">
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" required />
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label">Пароль</label>
+                                    <input type="password" name="password" class="form-control" required />
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">Войти</button>
+                                </div>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <!-- Информация после входа -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Текущий User ID:</strong>
+                                <span class="fs-5 text-primary">@ViewData["CurrentUserId"]</span>
+                            </div>
+                            <a asp-controller="Account" asp-action="Logout"
+                               class="btn btn-outline-danger">Выйти</a>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
-    }
-    else
-    {
-        <p><strong>Текущий User ID:</strong> @ViewData["CurrentUserId"]</p>
-        <a asp-controller="Account" asp-action="Logout" class="btn btn-danger mb-4">Выйти</a>
 
-        <div class="row g-4">
-
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-info text-white">
-                        <h5>1. Получить баллы игрока</h5>
-                    </div>
-                    <div class="card-body">
+        <!-- Получить баллы -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5>1. Получить баллы игрока</h5>
+                </div>
+                <div class="card-body">
+                    @if (!(bool)ViewData["IsLoggedIn"])
+                    {
+                        <div class="alert alert-warning py-2">
+                            <small>Войдите в систему, чтобы получить баллы игрока.</small>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted small">
+                            Узнать количество баллов у игрока по его User ID.
+                        </p>
                         <form asp-action="GetPoints" method="post">
                             <div class="input-group">
-                                <input type="text" name="playerId" class="form-control" placeholder="ID игрока" required />
+                                <input type="text" name="playerId" class="form-control"
+                                       placeholder="ID игрока" value="@ViewData["CurrentUserId"]" required />
                                 <button type="submit" class="btn btn-info">Получить баллы</button>
                             </div>
                         </form>
-                    </div>
+                    }
                 </div>
             </div>
+        </div>
 
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-success text-white">
-                        <h5>2. Добавить баллы (по названию игры)</h5>
-                    </div>
-                    <div class="card-body">
+        <!-- Добавить баллы -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5>2. Добавить баллы игроку</h5>
+                </div>
+                <div class="card-body">
+                    @if (!(bool)ViewData["IsLoggedIn"])
+                    {
+                        <div class="alert alert-warning py-2">
+                            <small>Войдите в систему, чтобы добавлять баллы.</small>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted small">
+                            Добавляет баллы игроку в указанную игру. Game ID можно скопировать ниже.
+                        </p>
                         <form asp-action="AddPoints" method="post">
                             <div class="mb-3">
-                                <label class="form-label">Название игры</label>
-                                <input type="text" name="gameTitle" class="form-control"
-                                       placeholder="Например: Test Game" required />
+                                <label class="form-label">Game ID</label>
+                                <input type="text" name="gameId" class="form-control"
+                                       placeholder="Введите Game ID" required />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">ID игрока (пользователя)</label>
-                                <input type="text" name="playerId" class="form-control" required />
+                                <label class="form-label">ID игрока</label>
+                                <input type="text" name="playerId" class="form-control"
+                                       value="@ViewData["CurrentUserId"]" required />
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Количество баллов</label>
@@ -65,32 +123,67 @@
                             </div>
                             <button type="submit" class="btn btn-success w-100">Добавить баллы</button>
                         </form>
-                    </div>
+                    }
                 </div>
             </div>
-
         </div>
 
-        <div class="mt-5">
-            <h5>Ваши игры (для справки):</h5>
-            @{
-                var games = ViewData["Games"] as Game[] ?? Array.Empty<Game>();
-            }
-            @if (games.Length > 0)
-            {
-                <ul class="list-group">
-                    @foreach (var game in games)
+        <!-- Игры разработчика -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5>3. Игры разработчика (справочная информация)</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Здесь отображаются игры разработчика (привязанные к используемому API-ключу).<br>
+                        Это не игры текущего пользователя, а игры владельца ключа.
+                    </p>
+
+
+                    <form asp-action="GetDevGames" method="post" class="mb-3">
+                        <button type="submit" class="btn btn-outline-secondary">Обновить список игр</button>
+                    </form>
+
+
+                    @if ((ViewData["Games"] as Game[] ?? Array.Empty<Game>()).Length > 0)
                     {
-                        <li class="list-group-item">
-                            <strong>@game.gameTitle</strong> — ID: <code>@game.gameId</code>
-                        </li>
+                        <ul class="list-group">
+                            @foreach (var game in (ViewData["Games"] as Game[] ?? Array.Empty<Game>()))
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>@game.gameTitle</strong><br>
+                                        <small class="text-muted">Game ID: <code>@game.gameId</code></small>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary copy-btn"
+                                            data-gameid="@game.gameId">
+                                        Копировать ID
+                                    </button>
+                                </li>
+                            }
+                        </ul>
                     }
-                </ul>
-            }
-            else
-            {
-                <p class="text-muted">Список игр пуст или не удалось загрузить.</p>
-            }
+                    else
+                    {
+                        <p class="text-muted">Список игр пуст. Нажмите кнопку «Обновить список игр».</p>
+                    }
+                </div>
+            </div>
         </div>
-    }
+
+    </div>
 </div>
+
+<script>
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const gameId = btn.getAttribute('data-gameid');
+            navigator.clipboard.writeText(gameId).then(() => {
+                const original = btn.textContent;
+                btn.textContent = '✓ Скопировано';
+                setTimeout(() => btn.textContent = 'Копировать ID', 2000);
+            });
+        });
+    });
+</script>

@@ -59,7 +59,7 @@ namespace GameWithApiASPTemplate.Controllers
         public IActionResult Logout()
         {
             Response.Cookies.Delete("UserId");
-            return RedirectToAction("Login");
+            return RedirectToAction("Index", "Home");
         }
 
     }
