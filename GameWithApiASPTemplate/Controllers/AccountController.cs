@@ -29,7 +29,7 @@ namespace GameWithApiASPTemplate.Controllers
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
                 ViewData["Error"] = "Введите email и пароль";
-                return RedirectToAction("Login");
+                return RedirectToAction("Index", "Home");
             }
 
             try
@@ -53,7 +53,7 @@ namespace GameWithApiASPTemplate.Controllers
                 ViewData["Error"] = $"Ошибка входа: {ex.Message}";
             }
 
-            return RedirectToAction("Login");
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Logout()
